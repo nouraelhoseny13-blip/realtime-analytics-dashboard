@@ -1,75 +1,295 @@
-# React + TypeScript + Vite
+# Real-Time Analytics Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A production-ready real-time analytics dashboard built with React, TypeScript, FastAPI, PostgreSQL, WebSocket, and JWT authentication.
 
-Currently, two official plugins are available:
+The platform provides live system monitoring, analytics, service performance metrics, endpoint statistics, activity tracking, notifications, and authenticated dashboard access.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Live Demo
 
-## React Compiler
+**Frontend:**
+https://realtime-analytics-dashboard-theta.vercel.app/
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**Backend API:**
+https://realtime-analytics-backend.fastapicloud.dev/
 
-## Expanding the ESLint configuration
+**API Documentation:**
+https://realtime-analytics-backend.fastapicloud.dev/docs
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Features
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+* Real-time analytics dashboard
+* Live WebSocket updates
+* JWT authentication
+* Protected dashboard routes
+* PostgreSQL database
+* FastAPI REST API
+* Service performance monitoring
+* Endpoint request analytics
+* Traffic monitoring
+* Error-rate tracking
+* Response-time monitoring
+* Activity feed
+* Notifications
+* Dark / Light mode
+* Responsive dashboard UI
+* Production deployment
+* Environment-based configuration
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Tech Stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Frontend
 
+* React
+* TypeScript
+* Vite
+* Tailwind CSS
+* Lucide React
+* Recharts
+* WebSocket
+* React Router
+
+### Backend
+
+* FastAPI
+* Python
+* SQLAlchemy
+* PostgreSQL
+* Psycopg
+* JWT
+* Passlib
+* Pydantic
+
+### Infrastructure
+
+* Vercel — Frontend deployment
+* FastAPI Cloud — Backend deployment
+* Neon — PostgreSQL database
+* GitHub — Source control
+
+## Architecture
+
+```text
+                    ┌──────────────────────┐
+                    │       Vercel         │
+                    │   React Frontend     │
+                    └──────────┬───────────┘
+                               │
+                     REST API / WebSocket
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │    FastAPI Cloud     │
+                    │    FastAPI Backend   │
+                    └──────────┬───────────┘
+                               │
+                         SQLAlchemy
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │        Neon          │
+                    │   PostgreSQL DB      │
+                    └──────────────────────┘
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+## Dashboard
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+The dashboard provides a real-time overview of application performance, including:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+* Active users
+* Requests per minute
+* Peak traffic
+* Success rate
+* Average response time
+* Error rate
+* Total requests
 
+It also includes detailed service and endpoint analytics.
+
+## Authentication
+
+Authentication is implemented using JWT access tokens.
+
+The authentication flow includes:
+
+1. User login
+2. Password verification
+3. JWT token generation
+4. Protected API requests
+5. Current-user validation
+6. Logout handling
+
+Sensitive configuration values are stored using environment variables and are not committed to the repository.
+
+## Real-Time Data
+
+The dashboard uses WebSocket communication to receive live analytics updates without requiring continuous page refreshes.
+
+```text
+Dashboard
+    │
+    │ WebSocket
+    ▼
+FastAPI WebSocket
+    │
+    ▼
+Analytics Data
+    │
+    ▼
+Live UI Updates
 ```
+
+## API
+
+Main API endpoints include:
+
+```text
+POST /api/auth/login
+GET  /api/auth/me
+POST /api/auth/logout
+
+GET  /api/analytics
+GET  /api/activity
+GET  /api/notifications
+
+WebSocket
+/api/ws/analytics
+```
+
+Interactive API documentation is available through FastAPI Swagger UI:
+
+https://realtime-analytics-backend.fastapicloud.dev/docs
+
+## Environment Variables
+
+### Frontend
+
+```env
+VITE_API_URL=https://your-backend-url/api
+```
+
+### Backend
+
+```env
+DATABASE_URL=your_database_url
+SECRET_KEY=your_secret_key
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+FRONTEND_URL=https://your-frontend-url
+```
+
+Never commit `.env` files or production secrets to GitHub.
+
+## Local Development
+
+### Frontend
+
+```bash
+cd realtime-analytics-dashboard
+npm install
+npm run dev
+```
+
+The frontend runs by default at:
+
+```text
+http://localhost:5173
+```
+
+### Backend
+
+```bash
+cd realtime-analytics-backend
+python -m venv .venv
+```
+
+Activate the virtual environment on Windows:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Install dependencies:
+
+```powershell
+pip install -r requirements.txt
+```
+
+Start the API:
+
+```powershell
+uvicorn app.main:app --reload
+```
+
+The backend runs by default at:
+
+```text
+http://127.0.0.1:8000
+```
+
+## Production
+
+The production architecture is:
+
+```text
+React + Vite
+      │
+      ▼
+   Vercel
+      │
+      ▼
+FastAPI Cloud
+      │
+      ▼
+     Neon
+ PostgreSQL
+```
+
+The application has been configured for production deployment with:
+
+* Environment variables
+* Secure JWT authentication
+* PostgreSQL
+* CORS configuration
+* Production API deployment
+* WebSocket support
+* Separate frontend and backend deployments
+
+## Project Status
+
+### Completed
+
+* Frontend foundation
+* Architecture cleanup
+* API / data layer
+* FastAPI backend
+* PostgreSQL integration
+* Authentication
+* WebSocket
+* Advanced analytics
+* Professional UX states
+* Performance optimization
+* Testing
+* Security configuration
+* Production deployment
+* GitHub repositories
+
+### Final Stage
+
+* README documentation
+* Final portfolio polish
+* Project presentation
+* Portfolio screenshots
+* LinkedIn / GitHub presentation
+
+## Author
+
+**Noura Elhoseny**
+
+Artificial Intelligence Student & Frontend Developer
+
+GitHub:
+https://github.com/nouraelhoseny13-blip
+
+---
+
+Built as a production-oriented full-stack analytics platform combining modern React frontend architecture with a FastAPI backend, PostgreSQL persistence, JWT authentication, and real-time WebSocket communication.
