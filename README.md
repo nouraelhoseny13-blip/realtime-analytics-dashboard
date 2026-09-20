@@ -47,6 +47,7 @@ https://realtime-analytics-backend.fastapicloud.dev/docs
 * Recharts
 * WebSocket
 * React Router
+* TanStack React Query
 
 ### Backend
 
@@ -271,11 +272,10 @@ The application has been configured for production deployment with:
 * Testing
 * Security configuration
 * Production deployment
-* GitHub repositories
+* GitHub source control
 
 ### Final Stage
 
-* README documentation
 * Final portfolio polish
 * Project presentation
 * Portfolio screenshots

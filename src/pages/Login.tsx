@@ -1,3 +1,4 @@
+```tsx
 import {
   useState,
   type FormEvent,
@@ -196,12 +197,24 @@ export default function Login() {
               </div>
 
               <div>
-                <label
-                  htmlFor="password"
-                  className="mb-2 block text-sm font-medium text-slate-300"
-                >
-                  Password
-                </label>
+                <div className="mb-2 flex items-center justify-between">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-slate-300"
+                  >
+                    Password
+                  </label>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigate("/forgot-password")
+                    }
+                    className="text-xs font-medium text-sky-400 transition hover:text-sky-300"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
 
                 <div className="relative">
                   <Lock
@@ -241,9 +254,9 @@ export default function Login() {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-slate-300"
                   >
                     {showPassword ? (
-                      <EyeOff size={18} />
-                    ) : (
                       <Eye size={18} />
+                    ) : (
+                      <EyeOff size={18} />
                     )}
                   </button>
                 </div>
@@ -281,6 +294,19 @@ export default function Login() {
               </button>
             </form>
 
+            <div className="mt-6 text-center text-sm text-slate-500">
+              Don't have an account?{" "}
+              <button
+                type="button"
+                onClick={() =>
+                  navigate("/register")
+                }
+                className="font-medium text-sky-400 transition hover:text-sky-300"
+              >
+                Create an account
+              </button>
+            </div>
+
             <div className="mt-8 flex items-center gap-3 text-xs text-slate-600">
               <span className="h-px flex-1 bg-slate-800" />
 
@@ -296,3 +322,4 @@ export default function Login() {
     </main>
   );
 }
+```
