@@ -1,4 +1,3 @@
-```tsx
 import {
   useState,
   type FormEvent,
@@ -322,4 +321,4 @@ export default function Login() {
     </main>
   );
 }
-```
+

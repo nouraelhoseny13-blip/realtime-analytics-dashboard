@@ -6,9 +6,7 @@ import type {
 } from "./auth.types";
 
 export const authService = {
-  login(
-    credentials: LoginCredentials
-  ) {
+  login(credentials: LoginCredentials) {
     return api.post<AuthResponse>(
       "/auth/login",
       credentials

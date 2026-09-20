@@ -3,13 +3,17 @@ import {
   Activity,
   Bell,
   LayoutDashboard,
+  LogOut,
   Menu,
   Settings,
   X,
 } from "lucide-react";
 
+import { useNavigate } from "react-router-dom";
+
 import NotificationPanel from "../dashboard/NotificationPanel";
 import { useTheme } from "../../context/ThemeContext";
+import { useAuthContext } from "../../context/AuthContext";
 
 export default function Sidebar() {
   const [showNotifications, setShowNotifications] =
@@ -19,6 +23,8 @@ export default function Sidebar() {
     useState(false);
 
   const { theme } = useTheme();
+  const { logout, isLoading } = useAuthContext();
+  const navigate = useNavigate();
 
   const isDark = theme === "dark";
 
@@ -38,6 +44,14 @@ export default function Sidebar() {
     setShowNotifications((current) => !current);
   };
 
+  const handleLogout = async () => {
+    await logout();
+    closeMobileMenu();
+    navigate("/login", {
+      replace: true,
+    });
+  };
+
   return (
     <>
       {/* Desktop Sidebar */}
@@ -49,6 +63,8 @@ export default function Sidebar() {
           isDark={isDark}
           navItemClasses={navItemClasses}
           onNotifications={toggleNotifications}
+          onLogout={handleLogout}
+          isLoggingOut={isLoading}
           notificationsOpen={showNotifications}
         />
       </aside>
@@ -148,6 +164,8 @@ export default function Sidebar() {
               toggleNotifications();
               closeMobileMenu();
             }}
+            onLogout={handleLogout}
+            isLoggingOut={isLoading}
             onNavigate={closeMobileMenu}
             notificationsOpen={showNotifications}
           />
@@ -169,16 +187,20 @@ function SidebarContent({
   navItemClasses,
   onNotifications,
   onNavigate,
+  onLogout,
+  isLoggingOut = false,
   notificationsOpen = false,
 }: {
   isDark: boolean;
   navItemClasses: string;
   onNotifications: () => void;
   onNavigate?: () => void;
+  onLogout: () => Promise<void>;
+  isLoggingOut?: boolean;
   notificationsOpen?: boolean;
 }) {
   return (
-    <div>
+    <div className="flex h-full min-h-[calc(100vh-2.5rem)] flex-col">
       {/* Logo */}
       <div className="mb-10 flex items-center gap-3">
         <div
@@ -263,6 +285,29 @@ function SidebarContent({
           Settings
         </button>
       </nav>
+
+      {/* Logout */}
+      <div className="mt-auto pt-6">
+        <button
+          type="button"
+          onClick={onLogout}
+          disabled={isLoggingOut}
+          className={
+            isDark
+              ? "flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-400 transition-all duration-200 hover:bg-red-500/10 hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+              : "flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-500 transition-all duration-200 hover:bg-red-50 hover:text-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+          }
+        >
+          <LogOut
+            size={18}
+            aria-hidden="true"
+          />
+
+          {isLoggingOut
+            ? "Signing out..."
+            : "Logout"}
+        </button>
+      </div>
     </div>
   );
 }
