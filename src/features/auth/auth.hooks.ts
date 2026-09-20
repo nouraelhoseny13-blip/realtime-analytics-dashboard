@@ -12,12 +12,19 @@ import type {
   User,
 } from "./auth.types";
 
+import type {
+  RegisterCredentials,
+} from "./auth.service";
+
 type UseAuthResult = {
   user: User | null;
   isLoading: boolean;
   error: string | null;
   login: (
     credentials: LoginCredentials
+  ) => Promise<AuthResponse | null>;
+  register: (
+    credentials: RegisterCredentials
   ) => Promise<AuthResponse | null>;
   logout: () => Promise<void>;
 };
@@ -49,6 +56,23 @@ export function useAuth(): UseAuthResult {
       },
     });
 
+  const registerMutation =
+    useMutation({
+      mutationFn: (
+        credentials: RegisterCredentials
+      ) =>
+        authService.register(
+          credentials
+        ),
+
+      onSuccess: (result) => {
+        queryClient.setQueryData(
+          ["auth", "current-user"],
+          result.user
+        );
+      },
+    });
+
   const logoutMutation =
     useMutation({
       mutationFn:
@@ -64,6 +88,7 @@ export function useAuth(): UseAuthResult {
 
   const error =
     loginMutation.error ??
+    registerMutation.error ??
     logoutMutation.error ??
     userQuery.error;
 
@@ -73,6 +98,7 @@ export function useAuth(): UseAuthResult {
     isLoading:
       userQuery.isLoading ||
       loginMutation.isPending ||
+      registerMutation.isPending ||
       logoutMutation.isPending,
 
     error:
@@ -87,6 +113,18 @@ export function useAuth(): UseAuthResult {
     ) => {
       try {
         return await loginMutation.mutateAsync(
+          credentials
+        );
+      } catch {
+        return null;
+      }
+    },
+
+    register: async (
+      credentials: RegisterCredentials
+    ) => {
+      try {
+        return await registerMutation.mutateAsync(
           credentials
         );
       } catch {

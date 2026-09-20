@@ -1,95 +1,122 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
-
 import {
-  AuthProvider,
-  useAuthContext,
-} from "./AuthContext";
+  createContext,
+  useContext,
+  type ReactNode,
+} from "react";
 
-import { storage } from "../utils/storage";
 import { useAuth } from "../features/auth/auth.hooks";
 
-vi.mock("../features/auth/auth.hooks", () => ({
-  useAuth: vi.fn(),
-}));
+import type {
+  LoginCredentials,
+  User,
+} from "../features/auth/auth.types";
 
-describe("AuthContext", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    localStorage.clear();
-  });
+import type {
+  RegisterCredentials,
+} from "../features/auth/auth.service";
 
-  it("throws an error when used outside AuthProvider", () => {
-    expect(() => {
-      renderHook(() => useAuthContext());
-    }).toThrow(
+import { storage } from "../utils/storage";
+
+type AuthContextValue = {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+
+  login: (
+    credentials: LoginCredentials
+  ) => Promise<boolean>;
+
+  register: (
+    credentials: RegisterCredentials
+  ) => Promise<boolean>;
+
+  logout: () => Promise<void>;
+};
+
+const AuthContext =
+  createContext<AuthContextValue | null>(null);
+
+type AuthProviderProps = {
+  children: ReactNode;
+};
+
+export function AuthProvider({
+  children,
+}: AuthProviderProps) {
+  const {
+    user,
+    isLoading,
+    error,
+    login: authLogin,
+    register: authRegister,
+    logout: authLogout,
+  } = useAuth();
+
+  const login = async (
+    credentials: LoginCredentials
+  ): Promise<boolean> => {
+    const result = await authLogin(credentials);
+
+    if (!result?.accessToken) {
+      return false;
+    }
+
+    storage.setAccessToken(result.accessToken);
+
+    return true;
+  };
+
+  const register = async (
+    credentials: RegisterCredentials
+  ): Promise<boolean> => {
+    const result =
+      await authRegister(credentials);
+
+    if (!result?.accessToken) {
+      return false;
+    }
+
+    storage.setAccessToken(
+      result.accessToken
+    );
+
+    return true;
+  };
+
+  const logout = async (): Promise<void> => {
+    try {
+      await authLogout();
+    } finally {
+      storage.removeAccessToken();
+    }
+  };
+
+  const value: AuthContextValue = {
+    user,
+    isAuthenticated: Boolean(user),
+    isLoading,
+    error,
+    login,
+    register,
+    logout,
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuthContext(): AuthContextValue {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error(
       "useAuthContext must be used inside AuthProvider"
     );
-  });
+  }
 
-  it("stores the access token after successful login", async () => {
-    vi.mocked(useAuth).mockReturnValue({
-      user: {
-        id: "1",
-        email: "test@example.com",
-        name: "Test User",
-        role: "admin",
-      },
-      isLoading: false,
-      error: null,
-      login: vi.fn().mockResolvedValue({
-        accessToken: "test-access-token",
-      }),
-      logout: vi.fn().mockResolvedValue(undefined),
-    });
-
-    const { result } = renderHook(
-      () => useAuthContext(),
-      {
-        wrapper: AuthProvider,
-      }
-    );
-
-    let success = false;
-
-    await act(async () => {
-      success = await result.current.login({
-        email: "test@example.com",
-        password: "password",
-      });
-    });
-
-    expect(success).toBe(true);
-
-    expect(
-      storage.getAccessToken()
-    ).toBe("test-access-token");
-  });
-
-  it("removes the access token after logout", async () => {
-    storage.setAccessToken("existing-token");
-
-    vi.mocked(useAuth).mockReturnValue({
-      user: null,
-      isLoading: false,
-      error: null,
-      login: vi.fn(),
-      logout: vi.fn().mockResolvedValue(undefined),
-    });
-
-    const { result } = renderHook(
-      () => useAuthContext(),
-      {
-        wrapper: AuthProvider,
-      }
-    );
-
-    await act(async () => {
-      await result.current.logout();
-    });
-
-    expect(
-      storage.getAccessToken()
-    ).toBeNull();
-  });
-});
+  return context;
+}

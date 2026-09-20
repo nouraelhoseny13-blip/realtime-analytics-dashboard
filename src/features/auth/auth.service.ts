@@ -5,10 +5,23 @@ import type {
   LoginCredentials,
 } from "./auth.types";
 
+export type RegisterCredentials = {
+  name: string;
+  email: string;
+  password: string;
+};
+
 export const authService = {
   login(credentials: LoginCredentials) {
     return api.post<AuthResponse>(
       "/auth/login",
+      credentials
+    );
+  },
+
+  register(credentials: RegisterCredentials) {
+    return api.post<AuthResponse>(
+      "/auth/register",
       credentials
     );
   },

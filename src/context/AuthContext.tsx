@@ -1,14 +1,20 @@
-import {
+﻿import {
   createContext,
   useContext,
   type ReactNode,
 } from "react";
 
 import { useAuth } from "../features/auth/auth.hooks";
+
 import type {
   LoginCredentials,
   User,
 } from "../features/auth/auth.types";
+
+import type {
+  RegisterCredentials,
+} from "../features/auth/auth.service";
+
 import { storage } from "../utils/storage";
 
 type AuthContextValue = {
@@ -16,7 +22,15 @@ type AuthContextValue = {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  login: (credentials: LoginCredentials) => Promise<boolean>;
+
+  login: (
+    credentials: LoginCredentials
+  ) => Promise<boolean>;
+
+  register: (
+    credentials: RegisterCredentials
+  ) => Promise<boolean>;
+
   logout: () => Promise<void>;
 };
 
@@ -35,6 +49,7 @@ export function AuthProvider({
     isLoading,
     error,
     login: authLogin,
+    register: authRegister,
     logout: authLogout,
   } = useAuth();
 
@@ -48,6 +63,23 @@ export function AuthProvider({
     }
 
     storage.setAccessToken(result.accessToken);
+
+    return true;
+  };
+
+  const register = async (
+    credentials: RegisterCredentials
+  ): Promise<boolean> => {
+    const result =
+      await authRegister(credentials);
+
+    if (!result?.accessToken) {
+      return false;
+    }
+
+    storage.setAccessToken(
+      result.accessToken
+    );
 
     return true;
   };
@@ -66,6 +98,7 @@ export function AuthProvider({
     isLoading,
     error,
     login,
+    register,
     logout,
   };
 
